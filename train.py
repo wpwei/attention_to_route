@@ -38,5 +38,8 @@ if __name__ == '__main__':
     # optimizer
     parser.add_argument('--lr', type=float, default=1e-4)
 
+    # optimal cost of validation set
+    parser.add_argument('--val_optimal', type=float, default=3.84)
+
     args = parser.parse_args()
     main(args)

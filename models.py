@@ -333,5 +333,5 @@ class TSPAgent(pl.LightningModule):
 
     def validation_epoch_end(self, outputs):
         val_cost = torch.cat([x['val_cost'] for x in outputs]).mean()
-        gap = (val_cost - 3.8299) / 3.8299
+        gap = (val_cost - self.hparams.val_optimal) / self.hparams.val_optimal
         return {'val_loss': gap, 'log': {'val_cost': val_cost, 'val_gap': gap}}
