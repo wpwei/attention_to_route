@@ -317,8 +317,15 @@ class TSPAgent(pl.LightningModule):
                 self._bdl = self.baseline_dataloader()
 
     def val_dataloader(self):
-        val_data = load_dataset(
-            f'data/tsp/tsp{self.hparams.n_node}_validation_seed4321.pkl')
+        if self.hparams.n_node in [20, 50, 100]:
+            val_data = load_dataset(
+                f'data/tsp/tsp{self.hparams.n_node}_validation_seed4321.pkl')
+        elif self.hparams.val_set is not None:
+            val_data = load_dataset(self.hparams.val_set)
+        else:
+            print('No validation set is provided. Generating one.')
+            val_data = np.random.uniform(
+                size=[10000, self.hparams.n_node, 2]).astype(np.float32)
         val_set = TSPTestSet(val_data)
         return DataLoader(val_set,
                           batch_size=self.hparams.batch_size,
@@ -333,5 +340,4 @@ class TSPAgent(pl.LightningModule):
 
     def validation_epoch_end(self, outputs):
         val_cost = torch.cat([x['val_cost'] for x in outputs]).mean()
-        gap = (val_cost - self.hparams.val_optimal) / self.hparams.val_optimal
-        return {'val_loss': gap, 'log': {'val_cost': val_cost, 'val_gap': gap}}
+        return {'log': {'val_cost': val_cost}}

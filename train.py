@@ -7,13 +7,16 @@ def main(args):
     model = TSPAgent(args)
     trainer = Trainer.from_argparse_args(args)
     trainer.fit(model)
+    trainer.save_checkpoint(f'tsp{args.n_node}_ep{trainer.current_epoch}.ckpt')
 
 
 if __name__ == '__main__':
     parser = ArgumentParser()
 
-    # adds all the trainer options as default arguments (like max_epochs)
-    parser = Trainer.add_argparse_args(parser)
+    # hparams
+    parser.add_argument('--max_epochs', type=int, default=100)
+    parser.add_argument('--gpus', type=int, default=-1)
+    parser.add_argument('--gradient_clip_val', type=int, default=1)
 
     # network structure
     parser.add_argument('--input_dim', type=int, default=2)
@@ -29,6 +32,9 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=512)
     parser.add_argument('--n_node', type=int, default=20)
 
+    # validation set
+    parser.add_argument('--val_set', type=str, default=None)
+
     # baseline set
     parser.add_argument('--baseline_set_size', type=int, default=10000)
 
@@ -37,9 +43,6 @@ if __name__ == '__main__':
 
     # optimizer
     parser.add_argument('--lr', type=float, default=1e-4)
-
-    # optimal cost of validation set
-    parser.add_argument('--val_optimal', type=float, default=3.84)
 
     args = parser.parse_args()
     main(args)
